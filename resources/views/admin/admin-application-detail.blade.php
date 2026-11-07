@@ -28,9 +28,9 @@
             <div class="applied-form__group">
                 <label class="applied-form__header">出勤・退勤</label>
                 <div class="applied-form__input-group">
-                    <input class="applied-form__input" type="text" value="{{ $application->new_clock_in }}" readonly>
+                    <input class="applied-form__input" type="text" value="{{ \Carbon\Carbon::parse($application->new_clock_in)->format('H:i') }}" readonly>
                     <p class="wavy-line">〜</p>
-                    <input class="applied-form__input" type="text" value="{{ $application->new_clock_out }}" readonly>
+                    <input class="applied-form__input" type="text" value="{{ \Carbon\Carbon::parse($application->new_clock_out)->format('H:i') }}" readonly>
                 </div>
             </div>
             {{-- 休憩は「休憩」「休憩2」「休憩3」…とセクションを分けて表示 --}}
