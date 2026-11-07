@@ -11,17 +11,16 @@ use Symfony\Component\HttpFoundation\Response;
 class RedirectIfAuthenticated
 {
     /**
-     * Handle an incoming request.
-     *
-     * @param  Closure(Request): (Response)  $next
+     * ログイン済みのユーザーがログイン・会員登録画面を開いたら、それぞれのトップ画面へ移動する。
      */
     public function handle(Request $request, Closure $next, string ...$guards): Response
     {
         $guards = empty($guards) ? [null] : $guards;
 
         foreach ($guards as $guard) {
-            if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::HOME);
+            $user = Auth::guard($guard)->user();
+            if ($user !== null) {
+                return redirect($user->isAdmin() ? '/admin/attendance/list' : RouteServiceProvider::HOME);
             }
         }
 
