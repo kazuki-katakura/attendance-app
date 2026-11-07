@@ -2,14 +2,16 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class Handler extends ExceptionHandler
 {
     /**
-     * The list of the inputs that are never flashed to the session on validation exceptions.
-     *
      * @var array<int, string>
      */
     protected $dontFlash = [
@@ -19,12 +21,32 @@ class Handler extends ExceptionHandler
     ];
 
     /**
-     * Register the exception handling callbacks for the application.
+     * API（api/*）の 404・403 を、仕様どおりのエラー JSON に変換する。
+     *
+     * @param  Request  $request
      */
-    public function register(): void
+    public function render($request, Throwable $e): Response
     {
-        $this->reportable(function (Throwable $e) {
-            //
-        });
+        if ($request->is('api/*')) {
+            if ($e instanceof ModelNotFoundException) {
+                return response()->json(['error' => '勤怠情報が見つかりませんでした。'], 404);
+            }
+
+            if ($e instanceof AuthorizationException) {
+                return response()->json(['error' => 'この操作を実行する権限がありません。'], 403);
+            }
+        }
+
+        return parent::render($request, $e);
+    }
+
+    /**
+     * API へのリクエストは Accept ヘッダーに関わらず JSON でエラーを返す。
+     *
+     * @param  Request  $request
+     */
+    protected function shouldReturnJson($request, Throwable $e): bool
+    {
+        return $request->is('api/*') || parent::shouldReturnJson($request, $e);
     }
 }

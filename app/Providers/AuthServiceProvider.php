@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\AttendanceRecord;
+use App\Policies\AttendanceRecordPolicy;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -12,7 +14,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        //
+        AttendanceRecord::class => AttendanceRecordPolicy::class,
     ];
 
     /**
